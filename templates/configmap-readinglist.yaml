@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: readinglist-service-config
+  labels:
+    {{- include "myreadings.labels" . | nindent 4 }}
+data:
+  APP_READINGLIST_ENRICHMENT_STRATEGY: {{ .Values.readinglist.enrichmentStrategy | quote }}

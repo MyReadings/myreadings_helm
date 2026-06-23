@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-service-config
+  labels:
+    {{- include "myreadings.labels" . | nindent 4 }}
+data:
+  APP_SEARCH_ENRICHMENT_STRATEGY: {{ .Values.catalog.searchStrategy | quote }}

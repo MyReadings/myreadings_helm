@@ -1,0 +1,90 @@
+global:
+  imageRegistry: quay.io/rh-ee-drossi
+  otelEndpoint: http://myreadings-collector:4317
+
+keycloak:
+  hostname: myreadings-keycloak-service
+  port: "8080"
+  realm: my-readings
+  clientId: myreadings-client
+  tokenIssuer: ""
+
+rabbitmq:
+  vhost: my-readings
+  queueName: myreadings-queue
+  bindingKey: KK.EVENT.CLIENT.my-readings.SUCCESS.myreadings-client.REGISTER
+
+secrets:
+  postgres: myreadings-db-pguser-myreadings-user
+  keycloak: myreadings-keycloak-initial-admin
+  rabbitmq: myreadings-rabbitmq-default-user
+
+catalog:
+  image: myreadings-catalog-service
+  tag: v1.0.0
+  port: 8082
+  searchStrategy: normal
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+user:
+  image: myreadings-user-service
+  tag: v1.0.0
+  port: 8083
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+readinglist:
+  image: myreadings-readinglist-service
+  tag: v1.0.0
+  port: 8084
+  enrichmentStrategy: hexagonal
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+review:
+  image: myreadings-review-service
+  tag: v1.0.0
+  port: 8085
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+ui:
+  image: myreadings-ui
+  tag: v1.0.0
+  port: 8080
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+otel:
+  enabled: true
+  tempoEndpoint: https://tempo-platform-gateway.openshift-tracing.svc:8090
+  lokiEndpoint: https://logging-loki-gateway-http.openshift-logging.svc.cluster.local:8080/api/logs/v1/application/otlp
+
+alerts:
+  enabled: true

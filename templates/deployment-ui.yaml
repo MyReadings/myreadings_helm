@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myreadings-ui
+  labels:
+    app.kubernetes.io/name: myreadings-ui
+    {{- include "myreadings.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: myreadings-ui
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: myreadings-ui
+        {{- include "myreadings.labels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: myreadings-ui
+          image: {{ .Values.global.imageRegistry }}/{{ .Values.ui.image }}:{{ .Values.ui.tag }}
+          ports:
+            - containerPort: {{ .Values.ui.port }}
+              protocol: TCP
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CATALOG_SERVICE_URL
+              value: "http://catalog-service:{{ .Values.catalog.port }}"
+            - name: USER_SERVICE_URL
+              value: "http://user-service:{{ .Values.user.port }}"
+            - name: READINGLIST_SERVICE_URL
+              value: "http://readinglist-service:{{ .Values.readinglist.port }}"
+            - name: REVIEW_SERVICE_URL
+              value: "http://review-service:{{ .Values.review.port }}"
+            - name: KEYCLOAK_REALM
+              value: {{ .Values.keycloak.realm | quote }}
+            - name: KEYCLOAK_CLIENT_ID
+              value: {{ .Values.keycloak.clientId | quote }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.ui.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.ui.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            {{- toYaml .Values.ui.resources | nindent 12 }}

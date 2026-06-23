@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: readinglist-service
+  labels:
+    app.kubernetes.io/name: readinglist-service
+    {{- include "myreadings.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/name: readinglist-service
+  ports:
+    - name: http
+      port: {{ .Values.readinglist.port }}
+      targetPort: {{ .Values.readinglist.port }}
+      protocol: TCP

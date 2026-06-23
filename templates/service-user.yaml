@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  labels:
+    app.kubernetes.io/name: user-service
+    {{- include "myreadings.labels" . | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/name: user-service
+  ports:
+    - name: http
+      port: {{ .Values.user.port }}
+      targetPort: {{ .Values.user.port }}
+      protocol: TCP

@@ -1,0 +1,17 @@
+{{- if .Values.otel.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: myreadings-otel-collector-monitor
+  labels:
+    {{- include "myreadings.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: myreadings-collector
+  endpoints:
+    - port: prometheus
+      interval: 15s
+      path: /metrics
+      scheme: http
+{{- end }}
