@@ -6,7 +6,3 @@ metadata:
     {{- include "myreadings.labels" . | nindent 4 }}
 data:
   APP_SEARCH_ENRICHMENT_STRATEGY: {{ .Values.catalog.searchStrategy | quote }}
-  QUARKUS_DATASOURCE__BOOKS_DB__JDBC_MAX_SIZE: "40"
-  QUARKUS_DATASOURCE__BOOKS_DB__JDBC_MIN_SIZE: "10"
-  QUARKUS_DATASOURCE__BOOKS_DB__JDBC_ACQUISITION_TIMEOUT: "5"
-  QUARKUS_LOG_CONSOLE_JSON_PRETTY_PRINT: "false"
