@@ -23,14 +23,15 @@ catalog:
   image: myreadings-catalog-service
   tag: v1.0.0
   port: 8082
+  replicas: 2
   searchStrategy: normal
   resources:
     requests:
-      cpu: 250m
+      cpu: 500m
       memory: 512Mi
     limits:
-      cpu: "1"
-      memory: 768Mi
+      cpu: "2"
+      memory: 1Gi
 
 user:
   image: myreadings-user-service
@@ -39,10 +40,10 @@ user:
   resources:
     requests:
       cpu: 250m
-      memory: 512Mi
+      memory: 256Mi
     limits:
       cpu: "1"
-      memory: 768Mi
+      memory: 512Mi
 
 readinglist:
   image: myreadings-readinglist-service
@@ -51,11 +52,11 @@ readinglist:
   enrichmentStrategy: hexagonal
   resources:
     requests:
-      cpu: 250m
+      cpu: 500m
       memory: 512Mi
     limits:
-      cpu: "1"
-      memory: 768Mi
+      cpu: "2"
+      memory: 1Gi
 
 review:
   image: myreadings-review-service
@@ -64,10 +65,10 @@ review:
   resources:
     requests:
       cpu: 250m
-      memory: 512Mi
+      memory: 256Mi
     limits:
       cpu: "1"
-      memory: 768Mi
+      memory: 512Mi
 
 ui:
   image: myreadings-ui

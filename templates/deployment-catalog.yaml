@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/name: catalog-service
     {{- include "myreadings.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.catalog.replicas | default 1 }}
   selector:
     matchLabels:
       app.kubernetes.io/name: catalog-service
@@ -33,15 +33,15 @@ spec:
             httpGet:
               path: /q/health/ready
               port: {{ .Values.catalog.port }}
-            periodSeconds: 5
-            timeoutSeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 10
           livenessProbe:
             httpGet:
               path: /q/health/live
               port: {{ .Values.catalog.port }}
-            periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 3
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 5
           startupProbe:
             httpGet:
               path: /q/health/started
