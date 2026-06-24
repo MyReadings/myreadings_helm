@@ -6,7 +6,9 @@ metadata:
     app.kubernetes.io/name: readinglist-service
     {{- include "myreadings.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  {{- if not (and .Values.readinglist.autoscaling .Values.readinglist.autoscaling.enabled) }}
+  replicas: {{ .Values.readinglist.replicas | default 1 }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: readinglist-service

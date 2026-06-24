@@ -1,0 +1,26 @@
+{{- range $name, $svc := dict "catalog" $.Values.catalog "readinglist" $.Values.readinglist "review" $.Values.review }}
+{{- if and $svc.autoscaling $svc.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $name }}-service
+  labels:
+    app.kubernetes.io/name: {{ $name }}-service
+    {{- include "myreadings.labels" $ | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $name }}-service
+  minReplicas: {{ $svc.autoscaling.minReplicas | default 1 }}
+  maxReplicas: {{ $svc.autoscaling.maxReplicas | default 4 }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ $svc.autoscaling.targetCPU | default 70 }}
+---
+{{- end }}
+{{- end }}

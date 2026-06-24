@@ -6,7 +6,9 @@ metadata:
     app.kubernetes.io/name: catalog-service
     {{- include "myreadings.labels" . | nindent 4 }}
 spec:
+  {{- if not (and .Values.catalog.autoscaling .Values.catalog.autoscaling.enabled) }}
   replicas: {{ .Values.catalog.replicas | default 1 }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: catalog-service

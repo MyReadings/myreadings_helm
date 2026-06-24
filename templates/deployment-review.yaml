@@ -6,7 +6,9 @@ metadata:
     app.kubernetes.io/name: review-service
     {{- include "myreadings.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  {{- if not (and .Values.review.autoscaling .Values.review.autoscaling.enabled) }}
+  replicas: {{ .Values.review.replicas | default 1 }}
+  {{- end }}
   selector:
     matchLabels:
       app.kubernetes.io/name: review-service
