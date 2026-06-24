@@ -84,4 +84,16 @@ spec:
           annotations:
             summary: "Service CPU usage is above 80% of its limit"
             description: "A MyReadings service container is consuming more than 80% of its CPU limit."
+
+    - name: myreadings.availability
+      rules:
+        - alert: ContainerRestarting
+          expr: >
+            increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[5m]) > 0
+          for: 0s
+          labels:
+            severity: critical
+          annotations:
+            summary: "Container {{ "{{" }} $labels.container {{ "}}" }} is restarting"
+            description: "Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} has restarted in the last 5 minutes. Likely OOMKilled."
 {{- end }}
