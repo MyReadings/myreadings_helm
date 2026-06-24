@@ -27,10 +27,10 @@ catalog:
   resources:
     requests:
       cpu: 250m
-      memory: 256Mi
+      memory: 512Mi
     limits:
       cpu: "1"
-      memory: 512Mi
+      memory: 768Mi
 
 user:
   image: myreadings-user-service
@@ -39,10 +39,10 @@ user:
   resources:
     requests:
       cpu: 250m
-      memory: 256Mi
+      memory: 512Mi
     limits:
       cpu: "1"
-      memory: 512Mi
+      memory: 768Mi
 
 readinglist:
   image: myreadings-readinglist-service
@@ -52,10 +52,10 @@ readinglist:
   resources:
     requests:
       cpu: 250m
-      memory: 256Mi
+      memory: 512Mi
     limits:
       cpu: "1"
-      memory: 512Mi
+      memory: 768Mi
 
 review:
   image: myreadings-review-service
@@ -64,10 +64,10 @@ review:
   resources:
     requests:
       cpu: 250m
-      memory: 256Mi
+      memory: 512Mi
     limits:
       cpu: "1"
-      memory: 512Mi
+      memory: 768Mi
 
 ui:
   image: myreadings-ui
