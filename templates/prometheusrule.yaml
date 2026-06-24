@@ -64,13 +64,13 @@ spec:
       rules:
         - alert: AppRequestSaturation
           expr: >
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[2m])) > 200
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[2m])) > 15
           for: 15s
           labels:
             severity: warning
           annotations:
-            summary: "Request rate is above 200 req/s"
-            description: "MyReadings is receiving sustained high traffic (>200 req/s)."
+            summary: "Request rate is above 15 req/s"
+            description: "MyReadings is receiving sustained high traffic (>15 req/s)."
 
         - alert: AppCPUThrottling
           expr: >
@@ -96,4 +96,17 @@ spec:
           annotations:
             summary: "Container {{ "{{" }} $labels.container {{ "}}" }} is restarting"
             description: "Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} has restarted in the last 5 minutes. Likely OOMKilled."
+
+        - alert: ContainerMemoryHigh
+          expr: >
+            max by (container, pod) (
+              container_memory_working_set_bytes{namespace="{{ .Release.Namespace }}", container=~".*-service"}
+              / on(container, pod, namespace) kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", resource="memory"}
+            ) > 0.85
+          for: 15s
+          labels:
+            severity: warning
+          annotations:
+            summary: "Container {{ "{{" }} $labels.container {{ "}}" }} memory above 85% of limit"
+            description: "Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} is using more than 85% of its memory limit."
 {{- end }}
