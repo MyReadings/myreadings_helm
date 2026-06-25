@@ -12,74 +12,74 @@ spec:
         - alert: AppLatencyWarning
           expr: >
             histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[1m])) by (le)
+              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[1m])) by (le, exported_job)
             ) > 0.5
-          for: 15s
+          for: 30s
           labels:
             severity: warning
           annotations:
-            summary: "P95 latency across all endpoints is above 500ms"
-            description: "P95 latency across all MyReadings services has exceeded 500ms."
+            summary: "P95 latency on {{ "{{" }} $labels.exported_job {{ "}}" }} is above 500ms"
+            description: "P95 latency on {{ "{{" }} $labels.exported_job {{ "}}" }} has exceeded 500ms."
 
         - alert: AppLatencyCritical
           expr: >
             histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[1m])) by (le)
+              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[1m])) by (le, exported_job)
             ) > 1
-          for: 15s
+          for: 30s
           labels:
             severity: critical
           annotations:
-            summary: "P95 latency across all endpoints is above 1s"
-            description: "P95 latency across all MyReadings services has exceeded 1 second."
+            summary: "P95 latency on {{ "{{" }} $labels.exported_job {{ "}}" }} is above 1s"
+            description: "P95 latency on {{ "{{" }} $labels.exported_job {{ "}}" }} has exceeded 1 second."
 
     - name: myreadings.errors
       rules:
         - alert: AppErrorRateHigh
           expr: >
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service", http_response_status_code=~"5.."}[1m]))
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service", http_response_status_code=~"5.."}[1m])) by (exported_job)
             /
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[1m]))
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[1m])) by (exported_job)
             > 0.01
           for: 15s
           labels:
             severity: warning
           annotations:
-            summary: "HTTP 5xx error rate is above 1%"
-            description: "More than 1% of requests across MyReadings services are returning 5xx errors."
+            summary: "HTTP 5xx error rate on {{ "{{" }} $labels.exported_job {{ "}}" }} is above 1%"
+            description: "More than 1% of requests on {{ "{{" }} $labels.exported_job {{ "}}" }} are returning 5xx errors."
 
     - name: myreadings.saturation
       rules:
         - alert: AppCPUThrottling
           expr: >
-            max(rate(container_cpu_usage_seconds_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[1m]))
-            /
-            max(kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", container=~".*-service", resource="cpu"})
-            > 0.8
+            max by (container, pod) (
+              rate(container_cpu_usage_seconds_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[1m])
+              / on(container, pod, namespace) kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", container=~".*-service", resource="cpu"}
+            ) > 0.8
           for: 15s
           labels:
             severity: warning
           annotations:
-            summary: "Service CPU usage is above 80% of its limit"
-            description: "A MyReadings service container is consuming more than 80% of its CPU limit."
+            summary: "{{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} CPU above 80% of limit"
+            description: "Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} is consuming more than 80% of its CPU limit."
 
     - name: myreadings.availability
       rules:
         - alert: ContainerRestarting
           expr: >
-            increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[5m]) > 0
+            increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[2m]) > 0
           for: 0s
           labels:
             severity: critical
           annotations:
             summary: "Container {{ "{{" }} $labels.container {{ "}}" }} is restarting"
-            description: "Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} has restarted in the last 5 minutes. Likely OOMKilled."
+            description: "Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} has restarted in the last 2 minutes. Likely OOMKilled."
 
         - alert: ContainerMemoryHigh
           expr: >
             max by (container, pod) (
               container_memory_working_set_bytes{namespace="{{ .Release.Namespace }}", container=~".*-service"}
-              / on(container, pod, namespace) kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", resource="memory"}
+              / on(container, pod, namespace) group_left kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", resource="memory"}
             ) > 0.85
           for: 15s
           labels:
