@@ -12,7 +12,7 @@ spec:
         - alert: AppLatencyWarning
           expr: >
             histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[2m])) by (le)
+              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[1m])) by (le)
             ) > 0.5
           for: 15s
           labels:
@@ -24,7 +24,7 @@ spec:
         - alert: AppLatencyCritical
           expr: >
             histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[2m])) by (le)
+              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[1m])) by (le)
             ) > 1
           for: 15s
           labels:
@@ -36,7 +36,7 @@ spec:
         - alert: SearchLatencyCritical
           expr: >
             histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job="myreadings-catalog-service", http_route="/api/v1/books/search"}[2m])) by (le)
+              sum(rate(http_server_request_duration_seconds_bucket{exported_job="myreadings-catalog-service", http_route="/api/v1/books/search"}[1m])) by (le)
             ) > 0.5
           for: 15s
           labels:
@@ -49,9 +49,9 @@ spec:
       rules:
         - alert: AppErrorRateHigh
           expr: >
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service", http_response_status_code=~"5.."}[2m]))
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service", http_response_status_code=~"5.."}[1m]))
             /
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[2m]))
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[1m]))
             > 0.01
           for: 15s
           labels:
@@ -64,7 +64,7 @@ spec:
       rules:
         - alert: AppRequestSaturation
           expr: >
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[2m])) > 15
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[1m])) > 15
           for: 15s
           labels:
             severity: warning
@@ -74,7 +74,7 @@ spec:
 
         - alert: AppCPUThrottling
           expr: >
-            max(rate(container_cpu_usage_seconds_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[2m]))
+            max(rate(container_cpu_usage_seconds_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[1m]))
             /
             max(kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", container=~".*-service", resource="cpu"})
             > 0.8
