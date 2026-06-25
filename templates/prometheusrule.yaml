@@ -33,18 +33,6 @@ spec:
             summary: "P95 latency across all endpoints is above 1s"
             description: "P95 latency across all MyReadings services has exceeded 1 second."
 
-        - alert: SearchLatencyCritical
-          expr: >
-            histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job="myreadings-catalog-service", http_route="/api/v1/books/search"}[1m])) by (le)
-            ) > 0.5
-          for: 15s
-          labels:
-            severity: critical
-          annotations:
-            summary: "Search endpoint P95 latency is above 500ms"
-            description: "The /api/v1/books/search endpoint P95 latency on catalog-service has exceeded 500ms."
-
     - name: myreadings.errors
       rules:
         - alert: AppErrorRateHigh
@@ -62,16 +50,6 @@ spec:
 
     - name: myreadings.saturation
       rules:
-        - alert: AppRequestSaturation
-          expr: >
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[1m])) > 15
-          for: 15s
-          labels:
-            severity: warning
-          annotations:
-            summary: "Request rate is above 15 req/s"
-            description: "MyReadings is receiving sustained high traffic (>15 req/s)."
-
         - alert: AppCPUThrottling
           expr: >
             max(rate(container_cpu_usage_seconds_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[1m]))
