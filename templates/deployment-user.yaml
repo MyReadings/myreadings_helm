@@ -6,6 +6,7 @@ metadata:
     app.kubernetes.io/name: user-service
     {{- include "myreadings.labels" . | nindent 4 }}
 spec:
+  revisionHistoryLimit: 2
   replicas: 1
   selector:
     matchLabels:

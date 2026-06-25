@@ -6,6 +6,7 @@ metadata:
     app.kubernetes.io/name: catalog-service
     {{- include "myreadings.labels" . | nindent 4 }}
 spec:
+  revisionHistoryLimit: 2
   {{- if not (and .Values.catalog.autoscaling .Values.catalog.autoscaling.enabled) }}
   replicas: {{ .Values.catalog.replicas | default 1 }}
   {{- end }}
