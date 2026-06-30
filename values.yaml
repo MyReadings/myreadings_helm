@@ -22,7 +22,7 @@ secrets:
 
 catalog:
   image: myreadings-catalog-service
-  tag: v1.0.0
+  tag: v1.0.0-native
   port: 8082
   replicas: 1
   searchStrategy: normal
@@ -33,27 +33,27 @@ catalog:
     targetCPU: 70
   resources:
     requests:
-      cpu: 500m
-      memory: 512Mi
+      cpu: 300m
+      memory: 128Mi
     limits:
-      cpu: "2"
-      memory: 1Gi
+      cpu: "1"
+      memory: 256Mi
 
 user:
   image: myreadings-user-service
-  tag: v1.0.0
+  tag: v1.0.0-native
   port: 8083
   resources:
     requests:
-      cpu: 250m
-      memory: 256Mi
+      cpu: 100m
+      memory: 128Mi
     limits:
-      cpu: "1"
-      memory: 512Mi
+      cpu: 500m
+      memory: 256Mi
 
 readinglist:
   image: myreadings-readinglist-service
-  tag: v1.0.0
+  tag: v1.0.0-native
   port: 8084
   enrichmentStrategy: hexagonal
   autoscaling:
@@ -63,15 +63,15 @@ readinglist:
     targetCPU: 70
   resources:
     requests:
-      cpu: 500m
-      memory: 512Mi
+      cpu: 150m
+      memory: 128Mi
     limits:
-      cpu: "2"
-      memory: 1Gi
+      cpu: 500m
+      memory: 256Mi
 
 review:
   image: myreadings-review-service
-  tag: v1.0.0
+  tag: v1.0.0-native
   port: 8085
   autoscaling:
     enabled: true
@@ -80,11 +80,11 @@ review:
     targetCPU: 70
   resources:
     requests:
-      cpu: 250m
-      memory: 256Mi
+      cpu: 100m
+      memory: 128Mi
     limits:
-      cpu: "1"
-      memory: 512Mi
+      cpu: 500m
+      memory: 256Mi
 
 ui:
   image: myreadings-ui
