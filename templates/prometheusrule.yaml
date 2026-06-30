@@ -12,9 +12,9 @@ spec:
         - alert: AppLatencyWarning
           expr: >
             histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[1m])) by (le, exported_job)
+              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[30s])) by (le, exported_job)
             ) > 0.5
-          for: 30s
+          for: 10s
           labels:
             severity: warning
           annotations:
@@ -24,9 +24,9 @@ spec:
         - alert: AppLatencyCritical
           expr: >
             histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[1m])) by (le, exported_job)
+              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[30s])) by (le, exported_job)
             ) > 1
-          for: 30s
+          for: 10s
           labels:
             severity: critical
           annotations:
@@ -37,11 +37,11 @@ spec:
       rules:
         - alert: AppErrorRateHigh
           expr: >
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service", http_response_status_code=~"5.."}[1m])) by (exported_job)
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service", http_response_status_code=~"5.."}[30s])) by (exported_job)
             /
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[1m])) by (exported_job)
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[30s])) by (exported_job)
             > 0.01
-          for: 15s
+          for: 10s
           labels:
             severity: warning
           annotations:
@@ -53,10 +53,10 @@ spec:
         - alert: AppCPUThrottling
           expr: >
             max by (container, pod) (
-              rate(container_cpu_usage_seconds_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[1m])
+              rate(container_cpu_usage_seconds_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[30s])
               / on(container, pod, namespace) kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", container=~".*-service", resource="cpu"}
             ) > 0.8
-          for: 15s
+          for: 10s
           labels:
             severity: warning
           annotations:
@@ -81,7 +81,7 @@ spec:
               container_memory_working_set_bytes{namespace="{{ .Release.Namespace }}", container=~".*-service"}
               / on(container, pod, namespace) group_left kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", resource="memory"}
             ) > 0.85
-          for: 15s
+          for: 10s
           labels:
             severity: warning
           annotations:
