@@ -43,8 +43,10 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 - name: OTEL_EXPORTER_OTLP_ENDPOINT
   value: {{ .Values.global.otelEndpoint | quote }}
+{{- if not .Values.global.nativeMode }}
 - name: JAVA_TOOL_OPTIONS
   value: "-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+UseStringDeduplication -Xss512k"
+{{- end }}
 {{- end }}
 
 {{- define "myreadings.rabbitmqEnv" -}}

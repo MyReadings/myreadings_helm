@@ -1,6 +1,7 @@
 global:
   imageRegistry: quay.io/rh-ee-drossi
   otelEndpoint: http://myreadings-collector:4317
+  nativeMode: true
 
 keycloak:
   hostname: myreadings-keycloak-service
