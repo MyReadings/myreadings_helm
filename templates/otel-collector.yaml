@@ -53,6 +53,8 @@ spec:
     exporters:
       otlp/tempo:
         endpoint: {{ .Values.otel.tempoEndpoint }}
+        retry_on_failure:
+          enabled: false
         tls:
           insecure: false
           insecure_skip_verify: true

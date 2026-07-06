@@ -10,6 +10,11 @@ spec:
   {{- if not (and .Values.readinglist.autoscaling .Values.readinglist.autoscaling.enabled) }}
   replicas: {{ .Values.readinglist.replicas | default 1 }}
   {{- end }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: readinglist-service
