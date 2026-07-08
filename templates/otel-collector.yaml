@@ -46,6 +46,7 @@ spec:
             - 'attributes["http.target"] == "/q/health/ready"'
             - 'attributes["http.target"] == "/q/health/live"'
             - 'attributes["http.target"] == "/healthz"'
+            - 'IsMatch(attributes["url.full"], ".*/protocol/openid-connect/certs")'
         metrics:
           datapoint:
             - 'attributes["http.route"] == "/q/metrics"'
