@@ -5,6 +5,7 @@ metadata:
   name: myreadings-alerts
   labels:
     {{- include "myreadings.labels" . | nindent 4 }}
+    openshift.io/prometheus-rule-evaluation-scope: leaf-prometheus
 spec:
   groups:
     - name: myreadings.latency
