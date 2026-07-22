@@ -51,7 +51,15 @@ spec:
           annotations:
             summary: "HTTP 5xx error rate on {{ "{{" }} $labels.exported_job {{ "}}" }} is above 1%"
             description: "More than 1% of requests on {{ "{{" }} $labels.exported_job {{ "}}" }} are returning 5xx errors."
-
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: myreadings-infra-alerts
+  labels:
+    {{- include "myreadings.labels" . | nindent 4 }}
+spec:
+  groups:
     - name: myreadings.saturation
       rules:
         - alert: AppCPUThrottling
