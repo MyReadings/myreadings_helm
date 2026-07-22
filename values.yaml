@@ -26,6 +26,7 @@ catalog:
   port: 8082
   replicas: 1
   searchStrategy: normal
+  searchDelayMs: "0"
   autoscaling:
     enabled: true
     minReplicas: 2
