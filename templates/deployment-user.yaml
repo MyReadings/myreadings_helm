@@ -20,6 +20,7 @@ spec:
       containers:
         - name: user-service
           image: {{ .Values.global.imageRegistry }}/{{ .Values.user.image }}:{{ .Values.user.tag }}
+          imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.user.port }}
               protocol: TCP

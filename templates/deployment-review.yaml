@@ -22,6 +22,7 @@ spec:
       containers:
         - name: review-service
           image: {{ .Values.global.imageRegistry }}/{{ .Values.review.image }}:{{ .Values.review.tag }}
+          imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.review.port }}
               protocol: TCP

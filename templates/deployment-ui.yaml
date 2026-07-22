@@ -20,6 +20,7 @@ spec:
       containers:
         - name: myreadings-ui
           image: {{ .Values.global.imageRegistry }}/{{ .Values.ui.image }}:{{ .Values.ui.tag }}
+          imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.ui.port }}
               protocol: TCP

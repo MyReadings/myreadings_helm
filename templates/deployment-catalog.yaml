@@ -29,6 +29,7 @@ spec:
       containers:
         - name: catalog-service
           image: {{ .Values.global.imageRegistry }}/{{ .Values.catalog.image }}:{{ .Values.catalog.tag }}
+          imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.catalog.port }}
               protocol: TCP

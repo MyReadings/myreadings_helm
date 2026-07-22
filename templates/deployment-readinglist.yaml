@@ -29,6 +29,7 @@ spec:
       containers:
         - name: readinglist-service
           image: {{ .Values.global.imageRegistry }}/{{ .Values.readinglist.image }}:{{ .Values.readinglist.tag }}
+          imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.readinglist.port }}
               protocol: TCP
