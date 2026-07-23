@@ -5,7 +5,6 @@ metadata:
   name: myreadings-alerts
   labels:
     {{- include "myreadings.labels" . | nindent 4 }}
-    openshift.io/prometheus-rule-evaluation-scope: leaf-prometheus
 spec:
   groups:
     - name: myreadings.latency
@@ -51,55 +50,55 @@ spec:
           annotations:
             summary: "HTTP 5xx error rate on {{ "{{" }} $labels.exported_job {{ "}}" }} is above 1%"
             description: "More than 1% of requests on {{ "{{" }} $labels.exported_job {{ "}}" }} are returning 5xx errors."
----
-apiVersion: monitoring.coreos.com/v1
-kind: PrometheusRule
-metadata:
-  name: myreadings-infra-alerts
-  labels:
-    {{- include "myreadings.labels" . | nindent 4 }}
-spec:
-  groups:
+
     - name: myreadings.saturation
       rules:
         - alert: AppCPUThrottling
           expr: >
-            max by (container, pod) (
-              rate(container_cpu_usage_seconds_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[30s])
-              / on(container, pod, namespace) kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", container=~".*-service", resource="cpu"}
+            max by (k8s_container_name, k8s_pod_name) (
+              container_cpu_usage{k8s_namespace_name="{{ .Release.Namespace }}", k8s_container_name=~".*-service"}
+              / on(k8s_container_name, k8s_pod_name, k8s_namespace_name) group_left()
+              max by (k8s_container_name, k8s_pod_name, k8s_namespace_name) (
+                k8s_container_cpu_limit{k8s_namespace_name="{{ .Release.Namespace }}", k8s_container_name=~".*-service"}
+              )
             ) > 0.8
           for: 0s
           keep_firing_for: 2m
           labels:
             severity: warning
           annotations:
-            summary: "{{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} CPU above 80% of limit"
-            description: "Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} is consuming more than 80% of its CPU limit."
+            summary: "{{ "{{" }} $labels.k8s_container_name {{ "}}" }} in pod {{ "{{" }} $labels.k8s_pod_name {{ "}}" }} CPU above 80% of limit"
+            description: "Container {{ "{{" }} $labels.k8s_container_name {{ "}}" }} in pod {{ "{{" }} $labels.k8s_pod_name {{ "}}" }} is consuming more than 80% of its CPU limit."
 
     - name: myreadings.availability
       rules:
         - alert: ContainerRestarting
           expr: >
-            increase(kube_pod_container_status_restarts_total{namespace="{{ .Release.Namespace }}", container=~".*-service"}[2m]) > 0
+            max by (k8s_container_name, k8s_pod_name, k8s_namespace_name) (
+              k8s_container_restarts{k8s_namespace_name="{{ .Release.Namespace }}", k8s_container_name=~".*-service"}
+            ) > 3
           for: 0s
           keep_firing_for: 2m
           labels:
             severity: critical
           annotations:
-            summary: "Container {{ "{{" }} $labels.container {{ "}}" }} is restarting"
-            description: "Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} has restarted in the last 2 minutes. Likely OOMKilled."
+            summary: "Container {{ "{{" }} $labels.k8s_container_name {{ "}}" }} is restarting"
+            description: "Container {{ "{{" }} $labels.k8s_container_name {{ "}}" }} in pod {{ "{{" }} $labels.k8s_pod_name {{ "}}" }} has restarted. Count: {{ "{{" }} $value {{ "}}" }}."
 
         - alert: ContainerMemoryHigh
           expr: >
-            max by (container, pod) (
-              container_memory_working_set_bytes{namespace="{{ .Release.Namespace }}", container=~".*-service"}
-              / on(container, pod, namespace) group_left kube_pod_container_resource_limits{namespace="{{ .Release.Namespace }}", resource="memory"}
-            ) > 0.85
+            max by (k8s_container_name, k8s_pod_name) (
+              container_memory_usage_bytes{k8s_namespace_name="{{ .Release.Namespace }}", k8s_container_name=~".*-service"}
+              / on(k8s_container_name, k8s_pod_name, k8s_namespace_name) group_left()
+              max by (k8s_container_name, k8s_pod_name, k8s_namespace_name) (
+                k8s_container_memory_limit_bytes{k8s_namespace_name="{{ .Release.Namespace }}", k8s_container_name=~".*-service"}
+              )
+            ) > 0.75
           for: 0s
           keep_firing_for: 2m
           labels:
             severity: warning
           annotations:
-            summary: "Container {{ "{{" }} $labels.container {{ "}}" }} memory above 85% of limit"
-            description: "Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.pod {{ "}}" }} is using more than 85% of its memory limit."
+            summary: "Container {{ "{{" }} $labels.k8s_container_name {{ "}}" }} memory above 85% of limit"
+            description: "Container {{ "{{" }} $labels.k8s_container_name {{ "}}" }} in pod {{ "{{" }} $labels.k8s_pod_name {{ "}}" }} is using more than 85% of its memory limit."
 {{- end }}
