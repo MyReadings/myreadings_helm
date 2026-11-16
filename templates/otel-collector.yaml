@@ -36,6 +36,13 @@ spec:
             - k8s.pod.name
             - k8s.namespace.name
             - k8s.deployment.name
+          labels:
+            - tag_name: k8s_pod_label_app_kubernetes_io_name
+              key: app.kubernetes.io/name
+              from: pod
+            - tag_name: k8s_pod_label_app_kubernetes_io_part_of
+              key: app.kubernetes.io/part-of
+              from: pod
         pod_association:
           - sources: [{from: connection}]
       filter/drop_noise:
