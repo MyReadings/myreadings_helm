@@ -12,7 +12,7 @@ spec:
         - alert: AppLatencyWarning
           expr: >
             histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[30s])) by (le, exported_job)
+              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[30s])) by (le, exported_job, k8s_namespace_name)
             ) > 0.5
           for: 0s
           keep_firing_for: 2m
@@ -25,7 +25,7 @@ spec:
         - alert: AppLatencyCritical
           expr: >
             histogram_quantile(0.95,
-              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[30s])) by (le, exported_job)
+              sum(rate(http_server_request_duration_seconds_bucket{exported_job=~"myreadings-.*-service"}[30s])) by (le, exported_job, k8s_namespace_name)
             ) > 1
           for: 0s
           keep_firing_for: 2m
@@ -39,9 +39,9 @@ spec:
       rules:
         - alert: AppErrorRateHigh
           expr: >
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service", http_response_status_code=~"5.."}[30s])) by (exported_job)
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service", http_response_status_code=~"5.."}[30s])) by (exported_job, k8s_namespace_name)
             /
-            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[30s])) by (exported_job)
+            sum(rate(http_server_request_duration_seconds_count{exported_job=~"myreadings-.*-service"}[30s])) by (exported_job, k8s_namespace_name)
             > 0.01
           for: 0s
           keep_firing_for: 2m
@@ -55,7 +55,7 @@ spec:
       rules:
         - alert: AppCPUThrottling
           expr: >
-            max by (k8s_container_name, k8s_pod_name) (
+            max by (k8s_container_name, k8s_pod_name, k8s_namespace_name) (
               container_cpu_usage{k8s_namespace_name="{{ .Release.Namespace }}", k8s_container_name=~".*-service"}
               / on(k8s_container_name, k8s_pod_name, k8s_namespace_name) group_left()
               max by (k8s_container_name, k8s_pod_name, k8s_namespace_name) (
@@ -87,7 +87,7 @@ spec:
 
         - alert: ContainerMemoryHigh
           expr: >
-            max by (k8s_container_name, k8s_pod_name) (
+            max by (k8s_container_name, k8s_pod_name, k8s_namespace_name) (
               container_memory_usage_bytes{k8s_namespace_name="{{ .Release.Namespace }}", k8s_container_name=~".*-service"}
               / on(k8s_container_name, k8s_pod_name, k8s_namespace_name) group_left()
               max by (k8s_container_name, k8s_pod_name, k8s_namespace_name) (
