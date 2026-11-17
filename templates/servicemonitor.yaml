@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       app: myreadings-collector
+      operator.opentelemetry.io/collector-service-type: base
   endpoints:
     - port: prometheus
       interval: 15s
